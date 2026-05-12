@@ -27,16 +27,7 @@ Write a thorough, structured analysis {lang_instruction}. This is NOT a quick su
 
 **Formatting rules — follow strictly:**
 - Mathematical equations: use LaTeX. Inline: $equation$. Display/block: $$equation$$
-- Architecture diagrams, flowcharts, system diagrams: use ASCII art inside a plain fenced code block (\`\`\`). Rules:
-  - Use +-----+ boxes, | vertical lines, --> or -> arrows, v and ^ for vertical flow
-  - Keep each diagram ≤ 60 characters wide
-  - Example style:
-    \`\`\`
-    [Input] --> [Process] --> [Output]
-                    |
-                    v
-               [Side Effect]
-    \`\`\`
+- Architecture diagrams, flowcharts, system diagrams: use ASCII art inside a plain fenced code block. Use +-----+ boxes, | vertical lines, --> or -> arrows, v and ^ for vertical flow. Keep each diagram ≤ 60 characters wide.
 - Code shown on screen: reproduce in fenced code blocks with the correct language tag
 - For whiteboard derivations: capture the full mathematical development step-by-step in LaTeX
 
