@@ -17,6 +17,7 @@ This project contains code only. All data lives in the sibling `youtube-playlist
 
 ```
 youtube-playlist-summaries-ts/    ← this repo (code)
+├── token-ts.json                         # YouTube OAuth token (gitignored)
 ├── src/
 │   ├── app/
 │   │   ├── page.tsx                      # Dashboard (server component)
@@ -50,8 +51,7 @@ youtube-playlist-summaries-data/  ← data folder (not in git, sibling directory
 ├── _archive/               # Archived summaries
 ├── manifest.json           # Video index and ratings
 ├── archived.json           # Archive state
-├── client_secrets.json     # YouTube OAuth credentials
-└── token-ts.json           # YouTube OAuth token
+└── client_secrets.json     # YouTube OAuth credentials
 ```
 
 ## Setup
@@ -93,7 +93,7 @@ Get a free Gemini key at [aistudio.google.com](https://aistudio.google.com/app/a
 4. Add your Google account as a test user in the OAuth consent screen
 5. On first sync, a browser window will open for authorization — sign in with the account that owns the playlist
 
-The app stores its token at `token-ts.json` in the data folder.
+The app stores its token at `token-ts.json` in the project root (gitignored).
 
 ## Usage
 
@@ -166,7 +166,7 @@ Next.js (localhost:3000)
 
 ## Notes
 
-- `token-ts.json` (in the data folder) is account-specific. If playlist removal fails with a 403 error, delete it and re-run to re-authenticate with the correct account (sign in with the brand account that owns the playlist).
+- `token-ts.json` (in the project root) is account-specific. If playlist removal fails with a 403 error, delete it and re-run to re-authenticate with the correct account (sign in with the brand account that owns the playlist).
 - PDF generation uses pandoc/XeLaTeX via the "Gen PDF" button in the dashboard, or via the deep-dive "Gen PDF" button for deep-dive documents.
 - The dashboard reloads automatically after a sync completes.
 - Set `DATA_ROOT` in `.env.local` to point to a data folder in a non-default location.
