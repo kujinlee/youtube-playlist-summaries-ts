@@ -122,13 +122,13 @@ npm run lint     # Run Next.js linting
 
 Each video is rated automatically by Gemini on five dimensions (1–5):
 
-| Key | Dimension | Weight |
-|-----|-----------|--------|
-| U | Usefulness for Claude Code practitioners | 35% |
-| C | Comprehensiveness of coverage | 20% |
-| D | Depth / technical level | 15% |
-| O | Originality vs. commentary | 15% |
-| R | Recency | 15% |
+| Key | Column | Dimension | Weight |
+|-----|--------|-----------|--------|
+| U | Use | Usefulness for Claude Code practitioners | 35% |
+| C | Cmp | Comprehensiveness of coverage | 20% |
+| D | Dpt | Depth / technical level | 15% |
+| O | Ori | Originality vs. commentary | 15% |
+| R | Rel | Recency | 15% |
 
 Scores and ratings are stored in `manifest.json` in the data folder.
 
