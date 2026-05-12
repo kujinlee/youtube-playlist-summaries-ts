@@ -27,11 +27,16 @@ Write a thorough, structured analysis {lang_instruction}. This is NOT a quick su
 
 **Formatting rules — follow strictly:**
 - Mathematical equations: use LaTeX. Inline: $equation$. Display/block: $$equation$$
-- Architecture diagrams, flowcharts, system diagrams: use Mermaid code blocks (\`\`\`mermaid ... \`\`\`) with these strict rules:
-  - Always use \`graph TD\` (top-down), never \`graph LR\` — LR diagrams overflow the page width
-  - Never use double quotes inside node labels; use plain text or single quotes: \`A[label]\` or \`A["label with 'inner' quotes"]\`
-  - Never use \`""\` as an escape — replace any literal double-quote in a label with a single quote or omit it
-  - Keep each diagram to 6 nodes or fewer; split large flows into multiple focused diagrams
+- Architecture diagrams, flowcharts, system diagrams: use ASCII art inside a plain fenced code block (\`\`\`). Rules:
+  - Use +-----+ boxes, | vertical lines, --> or -> arrows, v and ^ for vertical flow
+  - Keep each diagram ≤ 60 characters wide
+  - Example style:
+    \`\`\`
+    [Input] --> [Process] --> [Output]
+                    |
+                    v
+               [Side Effect]
+    \`\`\`
 - Code shown on screen: reproduce in fenced code blocks with the correct language tag
 - For whiteboard derivations: capture the full mathematical development step-by-step in LaTeX
 
