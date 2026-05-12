@@ -52,6 +52,8 @@ export default function Dashboard({ videos: initial, totalCount, obsidianVault, 
         evts.close();
         setDeepDiving(false);
         setDeepDiveIds(prev => new Set([...prev, videoId]));
+      } else if (e.data === '__pdf_done__') {
+        setDeepDivePdfIds(prev => new Set([...prev, videoId]));
       } else {
         setDeepDiveLines(prev => [...prev, e.data as string]);
       }

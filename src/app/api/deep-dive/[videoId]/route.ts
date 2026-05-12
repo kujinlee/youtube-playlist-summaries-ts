@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { loadManifest } from '@/lib/manifest';
-import { generateDeepDive, deepDiveFilename } from '@/lib/deep-dive';
+import { generateDeepDive, generateDeepDivePdf, deepDiveFilename } from '@/lib/deep-dive';
 import { SUMMARIES_DIR } from '@/lib/config';
 
 export const maxDuration = 300;
@@ -37,6 +37,16 @@ export async function GET(
         const filename = deepDiveFilename(video);
         fs.writeFileSync(path.join(SUMMARIES_DIR, filename), md, 'utf-8');
         send(`Saved → video-summaries/${filename}`);
+
+        send('Generating PDF…');
+        try {
+          await generateDeepDivePdf(video);
+          send('PDF generated.');
+          send('__pdf_done__');
+        } catch (e) {
+          send(`PDF generation failed: ${e instanceof Error ? e.message : String(e)}`);
+        }
+
         send('__done__');
         controller.close();
       })().catch(err => {
