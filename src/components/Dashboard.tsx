@@ -26,7 +26,6 @@ export default function Dashboard({ videos: initial, totalCount, obsidianVault, 
   const [deepDiveTitle, setDeepDiveTitle]   = useState('');
   const [deepDiveIds, setDeepDiveIds]         = useState<Set<string>>(() => new Set(initialDeepDiveIds));
   const [deepDivePdfIds, setDeepDivePdfIds]   = useState<Set<string>>(() => new Set(initialDeepDivePdfIds));
-  const [pdfGenerating, setPdfGenerating]     = useState<Set<string>>(new Set());
 
   const toggleArchive = useCallback(async (index: number) => {
     const updated = videos.map(v =>
@@ -59,16 +58,6 @@ export default function Dashboard({ videos: initial, totalCount, obsidianVault, 
       }
     };
     evts.onerror = () => { evts.close(); setDeepDiving(false); };
-  }, []);
-
-  const generatePdf = useCallback(async (videoId: string) => {
-    setPdfGenerating(prev => new Set([...prev, videoId]));
-    try {
-      const res = await fetch(`/api/deep-dive/${videoId}/generate-pdf`, { method: 'POST' });
-      if (res.ok) setDeepDivePdfIds(prev => new Set([...prev, videoId]));
-    } finally {
-      setPdfGenerating(prev => { const s = new Set(prev); s.delete(videoId); return s; });
-    }
   }, []);
 
   const startSync = useCallback(() => {
@@ -129,8 +118,6 @@ export default function Dashboard({ videos: initial, totalCount, obsidianVault, 
         onDeepDive={startDeepDive}
         deepDiveIds={deepDiveIds}
         deepDivePdfIds={deepDivePdfIds}
-        pdfGenerating={pdfGenerating}
-        onGeneratePdf={generatePdf}
       />
     </div>
   );

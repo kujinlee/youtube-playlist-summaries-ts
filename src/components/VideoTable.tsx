@@ -12,8 +12,6 @@ interface Props {
   onDeepDive: (videoId: string, title: string) => void;
   deepDiveIds: Set<string>;
   deepDivePdfIds: Set<string>;
-  pdfGenerating: Set<string>;
-  onGeneratePdf: (videoId: string) => void;
 }
 
 const BADGE: Record<string, string> = {
@@ -49,7 +47,7 @@ function scoreColor(s: number) {
 
 type Filters = { search: string; lang: string; type: string; audience: string; minScore: number; showArchived: boolean };
 
-export default function VideoTable({ videos, obsidianVault, summariesFolder, obsidianFilePrefix, onToggleArchive, onDeepDive, deepDiveIds, deepDivePdfIds, pdfGenerating, onGeneratePdf }: Props) {
+export default function VideoTable({ videos, obsidianVault, summariesFolder, obsidianFilePrefix, onToggleArchive, onDeepDive, deepDiveIds, deepDivePdfIds }: Props) {
   const [sortCol, setSortCol] = useState<SortCol>('score');
   const [sortDir, setSortDir] = useState<SortDir>(-1);
   const [filters, setFilters] = useState<Filters>({
@@ -200,29 +198,14 @@ export default function VideoTable({ videos, obsidianVault, summariesFolder, obs
                         </a>
                         {' '}
                         {deepDivePdfIds.has(v.id) && (
-                          <>
-                            <a
-                              href={`/api/pdf/${v.filename.replace('.md', '_dive.pdf')}`}
-                              target="_blank" rel="noreferrer"
-                              style={{ fontSize: 11, padding: '1px 6px', borderRadius: 3, background: '#faece7', color: '#993c1d', textDecoration: 'none', fontWeight: 500 }}
-                            >
-                              PDF↗
-                            </a>
-                            {' '}
-                          </>
+                          <a
+                            href={`/api/pdf/${v.filename.replace('.md', '_dive.pdf')}`}
+                            target="_blank" rel="noreferrer"
+                            style={{ fontSize: 11, padding: '1px 6px', borderRadius: 3, background: '#faece7', color: '#993c1d', textDecoration: 'none', fontWeight: 500 }}
+                          >
+                            PDF↗
+                          </a>
                         )}
-                        <button
-                          onClick={() => onGeneratePdf(v.id)}
-                          disabled={pdfGenerating.has(v.id)}
-                          style={{
-                            fontSize: 11, padding: '1px 6px', borderRadius: 3,
-                            background: '#faece7', color: '#993c1d',
-                            border: 'none', cursor: pdfGenerating.has(v.id) ? 'default' : 'pointer',
-                            fontWeight: 500, opacity: pdfGenerating.has(v.id) ? 0.6 : 1,
-                          }}
-                        >
-                          {pdfGenerating.has(v.id) ? 'PDF…' : deepDivePdfIds.has(v.id) ? '↺ PDF' : 'Gen PDF'}
-                        </button>
                       </>
                     )}
                   </div>
