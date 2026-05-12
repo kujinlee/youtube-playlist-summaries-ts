@@ -199,28 +199,30 @@ export default function VideoTable({ videos, obsidianVault, summariesFolder, obs
                           Deep↗
                         </a>
                         {' '}
-                        {deepDivePdfIds.has(v.id) ? (
-                          <a
-                            href={`/api/pdf/${v.filename.replace('.md', '_dive.pdf')}`}
-                            target="_blank" rel="noreferrer"
-                            style={{ fontSize: 11, padding: '1px 6px', borderRadius: 3, background: '#faece7', color: '#993c1d', textDecoration: 'none', fontWeight: 500 }}
-                          >
-                            PDF↗
-                          </a>
-                        ) : (
-                          <button
-                            onClick={() => onGeneratePdf(v.id)}
-                            disabled={pdfGenerating.has(v.id)}
-                            style={{
-                              fontSize: 11, padding: '1px 6px', borderRadius: 3,
-                              background: '#faece7', color: '#993c1d',
-                              border: 'none', cursor: pdfGenerating.has(v.id) ? 'default' : 'pointer',
-                              fontWeight: 500, opacity: pdfGenerating.has(v.id) ? 0.6 : 1,
-                            }}
-                          >
-                            {pdfGenerating.has(v.id) ? 'PDF…' : 'Gen PDF'}
-                          </button>
+                        {deepDivePdfIds.has(v.id) && (
+                          <>
+                            <a
+                              href={`/api/pdf/${v.filename.replace('.md', '_dive.pdf')}`}
+                              target="_blank" rel="noreferrer"
+                              style={{ fontSize: 11, padding: '1px 6px', borderRadius: 3, background: '#faece7', color: '#993c1d', textDecoration: 'none', fontWeight: 500 }}
+                            >
+                              PDF↗
+                            </a>
+                            {' '}
+                          </>
                         )}
+                        <button
+                          onClick={() => onGeneratePdf(v.id)}
+                          disabled={pdfGenerating.has(v.id)}
+                          style={{
+                            fontSize: 11, padding: '1px 6px', borderRadius: 3,
+                            background: '#faece7', color: '#993c1d',
+                            border: 'none', cursor: pdfGenerating.has(v.id) ? 'default' : 'pointer',
+                            fontWeight: 500, opacity: pdfGenerating.has(v.id) ? 0.6 : 1,
+                          }}
+                        >
+                          {pdfGenerating.has(v.id) ? 'PDF…' : deepDivePdfIds.has(v.id) ? '↺ PDF' : 'Gen PDF'}
+                        </button>
                       </>
                     )}
                   </div>
