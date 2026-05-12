@@ -5,6 +5,7 @@ import { SUMMARIES_DIR, PDF_DIR } from './config';
 import type { Video } from '@/types';
 
 const MODEL = 'gemini-2.5-pro';
+const TRANSCRIPT_THRESHOLD_SECONDS = 50 * 60; // 50 minutes
 
 export function deepDiveFilename(video: Video): string {
   return video.filename.replace('.md', '_dive.md');
@@ -101,7 +102,16 @@ export function generateDeepDivePdf(video: Video): Promise<void> {
   });
 }
 
-export async function generateDeepDive(video: Video): Promise<string> {
+async function fetchTranscript(videoId: string): Promise<string> {
+  const { YoutubeTranscript } = await import('youtube-transcript');
+  const items = await YoutubeTranscript.fetchTranscript(videoId);
+  return (items as { text: string }[]).map(i => i.text).join(' ');
+}
+
+export async function generateDeepDive(
+  video: Video,
+  log?: (msg: string) => void,
+): Promise<string> {
   const prompt = PROMPT
     .replace(/{title}/g,            video.title)
     .replace(/{video_id}/g,         video.id)
@@ -111,17 +121,43 @@ export async function generateDeepDive(video: Video): Promise<string> {
     .replace(/{lang_instruction}/g, video.lang === 'KR' ? 'in Korean' : 'in English');
 
   const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY ?? '' });
+
+  const isLong = (video.duration ?? 0) > TRANSCRIPT_THRESHOLD_SECONDS;
+
+  if (!isLong) {
+    try {
+      log?.('Analysing video with Gemini (audio + visuals)…');
+      const response = await client.models.generateContent({
+        model: MODEL,
+        contents: [{
+          role: 'user',
+          parts: [
+            { fileData: { fileUri: `https://www.youtube.com/watch?v=${video.id}` } },
+            { text: prompt },
+          ],
+        }],
+      });
+      return response.text ?? '';
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (!msg.includes('input token count exceeds')) throw e;
+      log?.('Video too long for native analysis — falling back to transcript…');
+    }
+  } else {
+    const mins = Math.round((video.duration ?? 0) / 60);
+    log?.(`Video is ${mins} min — using transcript directly (exceeds ${TRANSCRIPT_THRESHOLD_SECONDS / 60} min threshold)…`);
+  }
+
+  log?.('Fetching YouTube transcript…');
+  const transcript = await fetchTranscript(video.id);
+  log?.(`Transcript fetched (${Math.round(transcript.length / 1000)}k chars) — generating deep dive…`);
+
   const response = await client.models.generateContent({
     model: MODEL,
-    contents: [
-      {
-        role: 'user',
-        parts: [
-          { fileData: { fileUri: `https://www.youtube.com/watch?v=${video.id}` } },
-          { text: prompt },
-        ],
-      },
-    ],
+    contents: [{
+      role: 'user',
+      parts: [{ text: `[YouTube Transcript]\n${transcript}\n\n${prompt}` }],
+    }],
   });
   return response.text ?? '';
 }

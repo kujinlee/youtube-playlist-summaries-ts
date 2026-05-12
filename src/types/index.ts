@@ -24,6 +24,7 @@ export interface Video {
   R: number;
   C: number;
   filename: string;
+  duration?: number;
 }
 
 export interface VideoWithMeta extends Video {

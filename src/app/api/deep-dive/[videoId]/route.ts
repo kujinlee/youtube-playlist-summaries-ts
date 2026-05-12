@@ -32,8 +32,7 @@ export async function GET(
         }
 
         send(`Deep dive: "${video.title}"`);
-        send('Analysing video with Gemini (audio + visuals)…');
-        const md = await generateDeepDive(video);
+        const md = await generateDeepDive(video, send);
 
         const filename = deepDiveFilename(video);
         fs.writeFileSync(path.join(SUMMARIES_DIR, filename), md, 'utf-8');

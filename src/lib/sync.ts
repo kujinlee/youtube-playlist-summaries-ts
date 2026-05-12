@@ -66,6 +66,7 @@ export async function runSync(log: (msg: string) => void): Promise<void> {
           R: result.ratings.R,
           C: result.ratings.C,
           filename,
+          ...(details.duration !== undefined && { duration: details.duration }),
         };
         manifest.videos.push(entry);
         nextIndex++;
