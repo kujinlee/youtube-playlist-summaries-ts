@@ -1,0 +1,23 @@
+# Next.js
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env.local
+.env*.local
+
+# Secrets & tokens
+token-ts.json
+client_secrets.json
+
+# Build artifacts
+tsconfig.tsbuildinfo
+
+# OMC plugin state
+.omc/
+
+# OS
+.DS_Store
