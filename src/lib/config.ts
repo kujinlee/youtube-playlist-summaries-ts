@@ -13,7 +13,7 @@ export const ARCHIVE_DIR    = path.join(DATA_ROOT, '_archive');
 export const ARCHIVE_PDF    = path.join(ARCHIVE_DIR, '_pdf');
 export const MANIFEST_PATH  = path.join(DATA_ROOT, 'manifest.json');
 export const ARCHIVED_PATH  = path.join(DATA_ROOT, 'archived.json');
-export const CLIENT_SECRETS = path.join(DATA_ROOT, 'client_secrets.json');
+export const CLIENT_SECRETS = path.join(process.cwd(), 'client_secrets.json');
 export const TOKEN_FILE = path.join(process.cwd(), 'token-ts.json');
 
 export const OBSIDIAN_VAULT        = process.env.OBSIDIAN_VAULT ?? path.basename(DATA_ROOT);

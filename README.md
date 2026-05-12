@@ -18,6 +18,7 @@ This project contains code only. All data lives in the sibling `youtube-playlist
 ```
 youtube-playlist-summaries-ts/    ← this repo (code)
 ├── token-ts.json                         # YouTube OAuth token (gitignored)
+├── client_secrets.json                   # YouTube OAuth credentials (gitignored)
 ├── src/
 │   ├── app/
 │   │   ├── page.tsx                      # Dashboard (server component)
@@ -50,8 +51,7 @@ youtube-playlist-summaries-data/  ← data folder (not in git, sibling directory
 ├── _pdf/                   # Generated PDFs (summaries + deep dives)
 ├── _archive/               # Archived summaries
 ├── manifest.json           # Video index and ratings
-├── archived.json           # Archive state
-└── client_secrets.json     # YouTube OAuth credentials
+└── archived.json           # Archive state
 ```
 
 ## Setup
@@ -89,7 +89,7 @@ Get a free Gemini key at [aistudio.google.com](https://aistudio.google.com/app/a
 
 1. Create a project in [Google Cloud Console](https://console.cloud.google.com/)
 2. Enable the YouTube Data API v3
-3. Create OAuth 2.0 credentials (Desktop app) and download as `client_secrets.json` into the data folder
+3. Create OAuth 2.0 credentials (Desktop app) and download as `client_secrets.json` into the project root
 4. Add your Google account as a test user in the OAuth consent screen
 5. On first sync, a browser window will open for authorization — sign in with the account that owns the playlist
 
