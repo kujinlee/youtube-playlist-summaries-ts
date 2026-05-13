@@ -63,6 +63,22 @@ export default function VideoTable({ videos, obsidianVault, summariesFolder, obs
     return () => window.removeEventListener('filter', handler);
   }, []);
 
+  const [openMenuIdx, setOpenMenuIdx] = useState<number | null>(null);
+  const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const close = (e: Event) => {
+      if ((e.target as HTMLElement).closest?.('[data-menu]')) return;
+      setOpenMenuIdx(null);
+    };
+    document.addEventListener('click', close);
+    document.addEventListener('scroll', close, true);
+    return () => {
+      document.removeEventListener('click', close);
+      document.removeEventListener('scroll', close, true);
+    };
+  }, []);
+
   const handleSort = (col: SortCol) => {
     if (col === sortCol) setSortDir(d => (d === 1 ? -1 : 1));
     else { setSortCol(col); setSortDir(typeof videos[0]?.[col] === 'number' ? -1 : 1); }
@@ -100,6 +116,8 @@ export default function VideoTable({ videos, obsidianVault, summariesFolder, obs
   const COL_LABEL: Record<string, string> = { U: 'Use', D: 'Dpt', O: 'Ori', R: 'Rel', C: 'Cmp' };
   const tdStyle = { padding: '8px 10px', borderBottom: '1px solid #f0ede6', verticalAlign: 'middle' as const };
   const tdCompact = { ...tdStyle, padding: '8px 4px', textAlign: 'center' as const, width: 28 };
+  const menuItemBase = { display: 'block', width: '100%', padding: '6px 14px', fontSize: 12, textAlign: 'left' as const, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', color: '#333', whiteSpace: 'nowrap' as const };
+  const menuDivider = { borderTop: '1px solid #f0ede6', margin: '3px 0' };
 
   return (
     <div>
@@ -212,6 +230,18 @@ export default function VideoTable({ videos, obsidianVault, summariesFolder, obs
                         )}
                       </>
                     )}
+                    {' '}
+                    <button
+                      data-menu
+                      onClick={e => {
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        setMenuPos({ x: rect.right, y: rect.bottom + 4 });
+                        setOpenMenuIdx(prev => prev === v.index ? null : v.index);
+                      }}
+                      style={{ fontSize: 11, padding: '1px 5px', borderRadius: 3, background: '#f5f4f0', color: '#555', border: '1px solid #d8d6ce', cursor: 'pointer', fontWeight: 700, lineHeight: 1 }}
+                    >
+                      ☰
+                    </button>
                   </div>
                   <div style={{ fontSize: 11, color: '#6b6a65', marginTop: 1 }}>{v.channel}</div>
                 </td>
@@ -231,6 +261,46 @@ export default function VideoTable({ videos, obsidianVault, summariesFolder, obs
           </tbody>
         </table>
       </div>
+
+      {/* Fixed dropdown menu — renders outside table to avoid overflow:hidden clipping */}
+      {openMenuIdx !== null && (() => {
+        const v = filtered.find(x => x.index === openMenuIdx);
+        if (!v) return null;
+        const obsFile = (prefix: string) => encodeURIComponent(obsidianFilePrefix ? `${obsidianFilePrefix}/${prefix}` : prefix);
+        return (
+          <div
+            data-menu
+            data-menu-popup
+            style={{
+              position: 'fixed', top: menuPos.y, left: menuPos.x,
+              transform: 'translateX(-100%)', zIndex: 1000,
+              background: '#fff', border: '1px solid #e0ded6', borderRadius: 6,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.12)', padding: '4px 0', minWidth: 190,
+            }}
+          >
+            <a href={`https://www.youtube.com/watch?v=${v.id}`} target="_blank" rel="noreferrer" style={menuItemBase}>▶ Watch on YouTube</a>
+            {!v.archived && (
+              <a href={`obsidian://open?vault=${encodeURIComponent(obsidianVault)}&file=${obsFile(v.filename.replace('.md', ''))}`} style={menuItemBase}>Open in Obsidian</a>
+            )}
+            <a href={`/api/pdf/${v.filename.replace('.md', '.pdf')}`} target="_blank" rel="noreferrer" style={menuItemBase}>View Summary PDF</a>
+            <div style={menuDivider} />
+            <button onClick={() => { onDeepDive(v.id, v.title); setOpenMenuIdx(null); }} style={menuItemBase}>Deep Dive</button>
+            {deepDiveIds.has(v.id) && (
+              <a href={`obsidian://open?vault=${encodeURIComponent(obsidianVault)}&file=${obsFile(v.filename.replace('.md', '_dive'))}`} style={menuItemBase}>Open Deep Dive</a>
+            )}
+            {deepDivePdfIds.has(v.id) && (
+              <a href={`/api/pdf/${v.filename.replace('.md', '_dive.pdf')}`} target="_blank" rel="noreferrer" style={menuItemBase}>View Deep Dive PDF</a>
+            )}
+            <div style={menuDivider} />
+            <button
+              onClick={() => { onToggleArchive(v.index); setOpenMenuIdx(null); }}
+              style={{ ...menuItemBase, color: v.archived ? '#854f0b' : '#6b6a65' }}
+            >
+              {v.archived ? '↩ Un-archive' : 'Archive'}
+            </button>
+          </div>
+        );
+      })()}
     </div>
   );
 }
