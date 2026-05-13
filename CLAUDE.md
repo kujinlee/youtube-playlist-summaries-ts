@@ -11,7 +11,22 @@ npm run start    # Start production server
 npm run lint     # Run Next.js ESLint
 ```
 
-No test suite exists in this project.
+```bash
+npm test         # Run all e2e tests (requires dev server on :3000)
+```
+
+## Testing
+
+Playwright e2e tests live in `tests/`. **Every new feature must have a corresponding test.**
+
+- Tests run against the live dev server (`npm run dev` on `:3000`)
+- Each test file is a standalone ESM script (`node tests/<name>.mjs`)
+- Tests must clean up after themselves (restore any data they mutate)
+- Use `DATA_ROOT` env var (defaults to `../youtube-playlist-summaries-data`) for data paths
+
+Existing tests:
+- `tests/archive-toggle.mjs` — archive/un-archive immediately moves MD + PDF files
+- `tests/pdf-archived.mjs` — PDF button on archived videos serves from `_archive/_pdf/`
 
 ## Architecture
 
