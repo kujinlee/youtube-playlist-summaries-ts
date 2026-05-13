@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node tests/archive-toggle.mjs"
+    "test": "node tests/archive-toggle.mjs && node tests/pdf-archived.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.2.0",
