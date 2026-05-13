@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { loadArchive, saveArchive } from '@/lib/archive';
+import { loadArchive, saveArchive, syncArchiveFiles } from '@/lib/archive';
+import { loadManifest } from '@/lib/manifest';
 
 export async function GET() {
   const data = loadArchive();
@@ -11,5 +12,7 @@ export async function POST(req: Request) {
   const existing = loadArchive();
   existing.archived = [...new Set(body.archived)].sort((a, b) => a - b);
   saveArchive(existing);
+  const manifest = loadManifest();
+  syncArchiveFiles(manifest, () => {});
   return NextResponse.json({ ok: true });
 }
