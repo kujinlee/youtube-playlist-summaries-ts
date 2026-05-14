@@ -43,7 +43,7 @@ try {
   console.log('\n[3] Archived video menu: no OBS, shows Un-archive…');
   await page.locator('input[type="checkbox"]').click();
   await page.waitForTimeout(300);
-  const archivedRow = page.locator('tr').filter({ has: page.locator('button', { hasText: '↩' }) }).first();
+  const archivedRow = page.locator('tr[style*="opacity: 0.4"]').first();
   const archivedMenuBtn = archivedRow.locator('button', { hasText: '☰' });
   await archivedMenuBtn.scrollIntoViewIfNeeded();
   await archivedMenuBtn.click();

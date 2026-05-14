@@ -38,14 +38,20 @@ try {
   const title = (await row.innerText()).split('\n')[1]?.trim().slice(0, 60);
   console.log(`Row [${VIDEO_IDX}]: ${title}`);
 
-  check('OBS button hidden (archived)', !(await row.locator('a', { hasText: 'OBS' }).isVisible()));
+  // Open ☰ menu
+  const menuBtn = row.locator('button', { hasText: '☰' });
+  await menuBtn.click();
+  const menu = page.locator('[data-menu-popup]');
+  await menu.waitFor({ state: 'visible', timeout: 5000 });
 
-  // Click PDF button — opens in new tab
-  console.log('\nClicking PDF button…');
+  check('OBS item hidden (archived)', !(await menu.locator('text=Open in Obsidian').isVisible()));
+
+  // Click "View Summary PDF" — opens in new tab
+  console.log('\nClicking View Summary PDF…');
   const context = browser.contexts()[0];
   const [newPage] = await Promise.all([
     context.waitForEvent('page'),
-    row.locator('a', { hasText: 'PDF' }).first().click(),
+    menu.locator('text=View Summary PDF').click(),
   ]);
 
   await newPage.waitForLoadState('domcontentloaded');

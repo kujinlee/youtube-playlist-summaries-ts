@@ -35,6 +35,15 @@ async function ensureUnarchived() {
   await new Promise(r => setTimeout(r, 500));
 }
 
+async function openMenu(row) {
+  const btn = row.locator('button', { hasText: '☰' });
+  await btn.scrollIntoViewIfNeeded();
+  await btn.click();
+  const menu = row.page().locator('[data-menu-popup]');
+  await menu.waitFor({ state: 'visible', timeout: 5000 });
+  return menu;
+}
+
 await ensureUnarchived();
 
 const browser = await chromium.launch({ headless: false, slowMo: 400 });
@@ -57,20 +66,24 @@ try {
 
   // ── Archive ──────────────────────────────────────────────
   console.log('\n[1] Archiving…');
-  const archiveBtn = row.locator('button', { hasText: 'Archive' });
-  await archiveBtn.waitFor({ timeout: 5000 });
+  let menu = await openMenu(row);
   await Promise.all([
     page.waitForResponse(r => r.url().includes('/api/archive') && r.request().method() === 'POST'),
-    archiveBtn.click(),
+    menu.locator('button', { hasText: 'Archive' }).click(),
   ]);
   await page.waitForTimeout(600);
 
-  check('Row opacity 0.4',   parseFloat(await row.evaluate(el => getComputedStyle(el).opacity)) < 0.5);
-  check('↩ button visible',  await row.locator('button', { hasText: '↩' }).isVisible());
-  check('OBS hidden',        !(await row.locator('a', { hasText: 'OBS' }).isVisible()));
+  check('Row opacity 0.4', parseFloat(await row.evaluate(el => getComputedStyle(el).opacity)) < 0.5);
+
+  // Verify OBS not in menu for archived row
+  menu = await openMenu(row);
+  check('OBS hidden (archived)', !(await menu.locator('text=Open in Obsidian').isVisible()));
+  await page.mouse.click(10, 10);
+  await page.waitForTimeout(300);
+
   check('MD → _archive/',    fs.existsSync(`${ARCHIVE}/${MD}`));
   check('MD ← video-summaries/', !fs.existsSync(`${SUMMARIES}/${MD}`));
-  const hadPdf = fs.existsSync(`${PDF_DIR}/${PDF}`);
+  const hadPdf = fs.existsSync(`${PDF_DIR}/${PDF}`) || fs.existsSync(`${ARCH_PDF}/${PDF}`);
   if (hadPdf) {
     check('PDF → _archive/_pdf/', fs.existsSync(`${ARCH_PDF}/${PDF}`));
     check('PDF ← _pdf/',          !fs.existsSync(`${PDF_DIR}/${PDF}`));
@@ -80,17 +93,21 @@ try {
 
   // ── Un-archive ───────────────────────────────────────────
   console.log('\n[2] Un-archiving…');
-  const unBtn = row.locator('button', { hasText: '↩' });
-  await unBtn.waitFor({ timeout: 5000 });
+  menu = await openMenu(row);
   await Promise.all([
     page.waitForResponse(r => r.url().includes('/api/archive') && r.request().method() === 'POST'),
-    unBtn.click(),
+    menu.locator('button', { hasText: 'Un-archive' }).click(),
   ]);
   await page.waitForTimeout(600);
 
-  check('Row opacity 1',          parseFloat(await row.evaluate(el => getComputedStyle(el).opacity)) >= 1);
-  check('Archive button back',    await row.locator('button', { hasText: 'Archive' }).isVisible());
-  check('OBS visible',            await row.locator('a', { hasText: 'OBS' }).isVisible());
+  check('Row opacity 1', parseFloat(await row.evaluate(el => getComputedStyle(el).opacity)) >= 1);
+
+  // Verify OBS back in menu for un-archived row
+  menu = await openMenu(row);
+  check('OBS visible (un-archived)', await menu.locator('text=Open in Obsidian').isVisible());
+  await page.mouse.click(10, 10);
+  await page.waitForTimeout(300);
+
   check('MD → video-summaries/', fs.existsSync(`${SUMMARIES}/${MD}`));
   check('MD ← _archive/',        !fs.existsSync(`${ARCHIVE}/${MD}`));
 

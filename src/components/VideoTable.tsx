@@ -168,69 +168,6 @@ export default function VideoTable({ videos, obsidianVault, summariesFolder, obs
                       }}>TOP</span>
                     )}
                     {' '}
-                    <a href={`https://www.youtube.com/watch?v=${v.id}`} target="_blank" rel="noreferrer"
-                      style={{ fontSize: 11, padding: '1px 6px', borderRadius: 3, background: '#fce8e8', color: '#cc0000', textDecoration: 'none', fontWeight: 500 }}>
-                      YT
-                    </a>
-                    {' '}
-                    {!v.archived && (
-                      <>
-                        <a href={`obsidian://open?vault=${encodeURIComponent(obsidianVault)}&file=${encodeURIComponent(obsidianFilePrefix ? `${obsidianFilePrefix}/${v.filename.replace('.md', '')}` : v.filename.replace('.md', ''))}`}
-                          style={{ fontSize: 11, padding: '1px 6px', borderRadius: 3, background: '#eeedfe', color: '#534ab7', textDecoration: 'none', fontWeight: 500 }}>
-                          OBS
-                        </a>
-                        {' '}
-                      </>
-                    )}
-                    <a href={`/api/pdf/${v.filename.replace('.md', '.pdf')}`} target="_blank" rel="noreferrer"
-                      style={{ fontSize: 11, padding: '1px 6px', borderRadius: 3, background: '#faece7', color: '#993c1d', textDecoration: 'none', fontWeight: 500 }}>
-                      PDF
-                    </a>
-                    {' '}
-                    <button
-                      onClick={() => onToggleArchive(v.index)}
-                      style={{
-                        fontSize: 11, padding: '1px 6px', borderRadius: 3,
-                        background: v.archived ? '#faeeda' : '#f0ede6',
-                        color: v.archived ? '#854f0b' : '#6b6a65',
-                        border: 'none', cursor: 'pointer', fontWeight: 500,
-                      }}
-                    >
-                      {v.archived ? '↩' : 'Archive'}
-                    </button>
-                    {' '}
-                    <button
-                      onClick={() => onDeepDive(v.id, v.title)}
-                      style={{
-                        fontSize: 11, padding: '1px 6px', borderRadius: 3,
-                        background: '#e1f5ee', color: '#085041',
-                        border: 'none', cursor: 'pointer', fontWeight: 500,
-                      }}
-                    >
-                      Dive
-                    </button>
-                    {deepDiveIds.has(v.id) && (
-                      <>
-                        {' '}
-                        <a
-                          href={`obsidian://open?vault=${encodeURIComponent(obsidianVault)}&file=${encodeURIComponent(obsidianFilePrefix ? `${obsidianFilePrefix}/${v.filename.replace('.md', '_dive')}` : v.filename.replace('.md', '_dive'))}`}
-                          style={{ fontSize: 11, padding: '1px 6px', borderRadius: 3, background: '#e1f5ee', color: '#085041', textDecoration: 'none', fontWeight: 500 }}
-                        >
-                          Deep↗
-                        </a>
-                        {' '}
-                        {deepDivePdfIds.has(v.id) && (
-                          <a
-                            href={`/api/pdf/${v.filename.replace('.md', '_dive.pdf')}`}
-                            target="_blank" rel="noreferrer"
-                            style={{ fontSize: 11, padding: '1px 6px', borderRadius: 3, background: '#faece7', color: '#993c1d', textDecoration: 'none', fontWeight: 500 }}
-                          >
-                            PDF↗
-                          </a>
-                        )}
-                      </>
-                    )}
-                    {' '}
                     <button
                       data-menu
                       onClick={e => {

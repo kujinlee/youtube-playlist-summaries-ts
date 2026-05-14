@@ -11,6 +11,7 @@ function generatePdf(mdPath: string, pdfPath: string): Promise<void> {
       '-V', 'geometry:margin=1in',
       '-V', 'colorlinks=true',
       '-V', 'linkcolor=blue',
+      '-V', 'CJKmainfont=Apple SD Gothic Neo',
     ], { stdio: ['ignore', 'pipe', 'pipe'] });
 
     let stderr = '';
