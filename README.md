@@ -8,8 +8,9 @@ A Next.js dashboard for managing the `Agentic AI. Claude Code` video-summary col
 - Generates structured markdown summaries and ratings with Gemini 2.5 Flash
 - Serves a web dashboard at `http://localhost:3000` for filtering, sorting, and archiving
 - Moves archived videos to `_archive/` and removes them from the YouTube playlist
-- Serves PDFs via `/api/pdf/[filename]` from the shared `_pdf/` folder
+- Serves PDFs on demand via `/api/pdf/[filename]`, generating them with pandoc/XeLaTeX if not cached
 - Integrates with Obsidian via `obsidian://` deep links
+- Per-row ☰ menu for all actions: YouTube, Obsidian, PDF, Archive, Deep Dive
 
 ## Repository layout
 
@@ -49,7 +50,8 @@ youtube-playlist-summaries-ts/    ← this repo (code)
 youtube-playlist-summaries-data/  ← data folder (not in git, sibling directory)
 ├── video-summaries/        # Markdown summaries + deep dives (*_dive.md)
 ├── _pdf/                   # Generated PDFs (summaries + deep dives)
-├── _archive/               # Archived summaries
+├── _archive/               # Archived markdown summaries
+│   └── _pdf/               # PDFs for archived videos
 ├── manifest.json           # Video index and ratings
 └── archived.json           # Archive state
 ```
@@ -106,7 +108,9 @@ npm run dev
 Opens `http://localhost:3000`. From the dashboard you can:
 
 - **Filter and sort** videos by language, type, audience, and score
-- **Archive** videos — moves files to `_archive/` and removes them from the YouTube playlist
+- **☰ menu** on each row — watch on YouTube, open in Obsidian, view PDF, archive/un-archive, deep dive
+- **Archive** — moves markdown and PDF files to `_archive/` immediately; removes video from YouTube playlist
+- **Deep Dive** — generates an extended analysis markdown and PDF automatically
 - **Sync** — fetches new playlist videos, generates summaries, and reloads the dashboard
 
 ### Commands
@@ -116,6 +120,7 @@ npm run dev      # Start the development server
 npm run build    # Build for production
 npm run start    # Start the production server
 npm run lint     # Run Next.js linting
+npm test         # Run Playwright e2e tests (requires dev server on :3000)
 ```
 
 ## Ratings
@@ -134,7 +139,7 @@ Scores and ratings are stored in `manifest.json` in the data folder.
 
 ## Obsidian integration
 
-Open the data vault root (`youtube-playlist-summaries/`) directly in Obsidian. Summaries live in `video-summaries/` and archived notes move to `_archive/`, keeping the main vault view uncluttered. OBS buttons in the dashboard open notes directly in Obsidian via the `obsidian://` URL scheme.
+Open the data vault root (`youtube-playlist-summaries/`) directly in Obsidian. Summaries live in `video-summaries/` and archived notes move to `_archive/`, keeping the main vault view uncluttered. Use the ☰ menu on each row to open notes directly in Obsidian via the `obsidian://` URL scheme (hidden for archived videos whose files have moved out of the vault).
 
 ## Dependencies
 
@@ -146,7 +151,9 @@ Managed by npm via `package.json`:
 | `@google/genai` | Gemini 2.5 Flash for summary generation |
 | `googleapis` | YouTube Data API v3 |
 | `google-auth-library` | YouTube OAuth flow |
+| `youtube-transcript` | Fetch video transcripts for deep-dive generation |
 | `yt-dlp` (system) | Playlist and video metadata fetching (called as subprocess) |
+| `playwright` (dev) | Playwright e2e tests (`npm test`) |
 
 ## Architecture
 
@@ -167,6 +174,6 @@ Next.js (localhost:3000)
 ## Notes
 
 - `token-ts.json` (in the project root) is account-specific. If playlist removal fails with a 403 error, delete it and re-run to re-authenticate with the correct account (sign in with the brand account that owns the playlist).
-- PDF generation uses pandoc/XeLaTeX via the "Gen PDF" button in the dashboard, or via the deep-dive "Gen PDF" button for deep-dive documents.
+- PDF generation uses pandoc/XeLaTeX on demand — clicking "View Summary PDF" or "View Deep Dive PDF" in the ☰ menu generates and caches the PDF automatically. Korean content is rendered correctly via the `xeCJK` package with Apple SD Gothic Neo.
 - The dashboard reloads automatically after a sync completes.
 - Set `DATA_ROOT` in `.env.local` to point to a data folder in a non-default location.
